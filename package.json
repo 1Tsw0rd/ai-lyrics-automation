@@ -1,0 +1,13 @@
+{
+  "name": "ai-lyrics-automation",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "lyrics": "cd lyrics && node index.claude.js",
+    "srt": "cd subtitle && node index.srt.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.0",
+    "dotenv": "^16.6.1"
+  }
+}

@@ -301,7 +301,7 @@ User   → 최종 가사(예: 1_Sample.json > lyrics)
 예:
 
 ```text
-lyrics/output/1_Test/1.Rain_on_the_Window.txt
+lyrics/output/1_Sample/1.Rain_on_the_Window.txt
 ```
 
 파일에는 영어 가사와 한국어 번역이 구분선으로 나뉘어 함께 저장된다.

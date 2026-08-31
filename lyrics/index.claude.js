@@ -113,7 +113,7 @@ async function generateLyrics(track, albumRules, prevFeedback = "", currentLyric
       system: systemPrompt,
       messages: [{ role: "user", content: userPrompt }],
     });
-    console.log(JSON.stringify(msg, null, 2));
+    // console.log(JSON.stringify(msg, null, 2)); 응답 디버깅용
     const textBlock = msg.content.find((block) => block.type === "text");
     const text = (textBlock?.text || "").trim();
     logDebug("Claude 가사생성 응답", text);

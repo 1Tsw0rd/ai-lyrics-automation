@@ -27,8 +27,8 @@ This project uses two types of AI.
 
 ## 1. Requirements
 
-- Node.js: https://nodejs.org/ko/download
-- NVM (optional): https://www.nvmnode.com/ko/guide/download.html
+- Node.js: https://nodejs.org/en/download
+- NVM (optional): https://github.com/nvm-sh/nvm
 - Claude API Key: https://platform.claude.com/
 
 - Python: https://www.python.org/downloads/
@@ -44,6 +44,7 @@ This project uses two types of AI.
 - Claude API
 - Python (for running OpenAI Whisper)
 - OpenAI Whisper
+- ffmpeg
 
 ---
 
@@ -275,7 +276,7 @@ User   → Song title (e.g. 1_Sample.json > title) + song description (e.g. 1_Sa
 ```text
 System → Album rules (e.g. 1_Sample.txt) + review rules (rules.json > lyric_review_checklist)
 User   → Track information (e.g. 1_Sample.json > title, concept)
-         + current lyrics (e.g. 1_Sample.json > lyrics)
+         + current lyrics (the version generated this round, held in memory)
          + previous feedback (Claude response after REVISION)
 ```
 
@@ -286,6 +287,13 @@ System → Album rules (e.g. 1_Sample.txt) + translation rules (rules.json > lyr
 User   → final lyrics (e.g. 1_Sample.json > lyrics)
 ```
 
+### Restart Behavior
+
+Behavior on restart depends on the track's status.
+
+- Starting from `todo` / `processing` / `error`: generation restarts from round 1. Lyrics and feedback from previous rounds are not saved, so they are not reused.
+- Starting from `lyrics_done`: the saved lyrics are reused as-is, skipping generation and review entirely, and only translation proceeds.
+
 ### Result Files
 
 Lyrics that pass review are followed by a Korean translation and saved under `lyrics/output/`.
@@ -293,7 +301,7 @@ Lyrics that pass review are followed by a Korean translation and saved under `ly
 Example:
 
 ```text
-lyrics/output/1_Test/1.Rain_on_the_Window.txt
+lyrics/output/1_Sample/1.Rain_on_the_Window.txt
 ```
 
 The file contains the English lyrics and a Korean translation, separated by a divider. The track's `concept` field (written as-is, in whatever language it was entered in the album JSON) appears at the top of the file.

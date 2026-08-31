@@ -29,7 +29,7 @@ AI를 이용한 음악 제작 보조 자동화 프로젝트.
 ## 1. 준비사항
 
 - Node.js: https://nodejs.org/ko/download
-- NVM (선택사항): https://www.nvmnode.com/ko/guide/download.html
+- NVM (선택사항): https://github.com/nvm-sh/nvm
 - Claude API Key: https://platform.claude.com/
 
 - Python: https://www.python.org/downloads/
@@ -45,6 +45,7 @@ AI를 이용한 음악 제작 보조 자동화 프로젝트.
 - Claude API
 - Python (OpenAI Whisper 실행용)
 - OpenAI Whisper
+- ffmpeg
 
 ---
 
@@ -274,7 +275,7 @@ User   → 곡 제목(예: 1_Sample.json > title) + 곡 설명(예: 1_Sample.jso
 ```text
 System → 앨범 규칙(예: 1_Sample.txt) + 검토 규칙(rules.json > lyric_review_checklist)
 User   → 곡 정보(예: 1_Sample.json > title, concept)
-         + 현재 가사(예: 1_Sample.json > lyrics)
+         + 현재 가사(이번 라운드에서 생성된 가사, 메모리상 값)
          + 이전 피드백 (REVISION 이후 Claude 응답)
 ```
 
@@ -284,6 +285,14 @@ User   → 곡 정보(예: 1_Sample.json > title, concept)
 System → 앨범 규칙(예: 1_Sample.txt) + 번역 규칙(rules.json > lyric_translate_rule)
 User   → 최종 가사(예: 1_Sample.json > lyrics)
 ```
+
+### 재시작 동작
+
+트랙 status에 따라 재시작 시 동작이 다르다.
+
+- `todo` / `processing` / `error`로 시작한 경우: 라운드 1부터 새로 생성한다. 이전 라운드의 가사·피드백은 저장되지 않으므로 재사용하지 않는다.
+- `lyrics_done`으로 시작한 경우: 저장된 가사를 그대로 사용하고, 생성·검토 과정 없이 번역만 진행한다.
+
 
 ### 결과 파일
 
@@ -295,7 +304,7 @@ User   → 최종 가사(예: 1_Sample.json > lyrics)
 lyrics/output/1_Test/1.Rain_on_the_Window.txt
 ```
 
-파일에는 영어 가사와 줄별 한국어 번역이 함께 저장된다.
+파일에는 영어 가사와 한국어 번역이 구분선으로 나뉘어 함께 저장된다.
 
 ```text
 1. Rain on the Window

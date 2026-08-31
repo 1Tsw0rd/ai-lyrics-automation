@@ -4,9 +4,15 @@ AI를 이용한 음악 제작 보조 자동화 프로젝트.
 
 이 프로젝트는 두 가지 방식의 AI를 사용한다.
 
-- **AI API** — 앨범별 기획 데이터를 기준으로 Claude API를 이용해 가사를 생성하고, 검토와 수정을 반복한 뒤 한국어 번역까지 처리한다.  
+* **AI API** — 앨범별 기획 데이터를 기준으로 Claude API를 이용해 가사를 생성하고, 검토와 수정을 반복한 뒤 한국어 번역까지 처리한다.
 
-- **로컬 AI** — 완성된 음악은 로컬에 설치된 Whisper를 이용해 음악 파일에서 SRT 자막을 추출한다.
+  **가사 생성 시연**
+  [demo-lyrics.mp4](./demo/demo-lyrics.mp4)
+
+* **로컬 AI** — 완성된 음악을 로컬에 설치된 Whisper로 처리하여 SRT 자막을 추출한다.
+
+  **자막 추출 시연**
+  [demo-subtitle.mp4](./demo/demo-subtitle.mp4)
 
 ---
 
@@ -16,10 +22,18 @@ AI를 이용한 음악 제작 보조 자동화 프로젝트.
 - NVM (선택사항): https://www.nvmnode.com/ko/guide/download.html
 - Claude API Key: https://platform.claude.com/
 
+- Python: https://www.python.org/downloads/
+- OpenAI Whisper: `pip install -U openai-whisper`
+- ffmpeg (Whisper 오디오 디코딩에 필요)
+  - macOS: `brew install ffmpeg`
+  - Ubuntu/Debian: `sudo apt install ffmpeg`
+  - Windows: https://ffmpeg.org/download.html
+
 ### 기술 스택
 
 - Node.js
 - Claude API
+- Python (OpenAI Whisper 실행용)
 - OpenAI Whisper
 
 ---
@@ -47,6 +61,10 @@ ai-lyrics-automation/
 ├── README.md
 ├── package.json
 │
+├── demo/                                  # 데모 영상
+│   ├── demo-lyrics.mp4
+│   └── demo-subtitle.mp4
+│
 ├── lyrics/
 │   ├── index.claude.js                    # 가사 자동화 실행 파일
 │   ├── album/                             # 앨범별 기획 데이터와 규칙
@@ -57,8 +75,8 @@ ai-lyrics-automation/
 │   ├── output/                            # 완성된 가사 결과물
 │   │   └── 1_Sample/                      # 결과물 저장할 앨범 디렉터리
 │   │         └── 1.Rain_on_the_Window.txt # 결과물 가사
-
-│   └── logs/                            # 실행 로그(DEBUG_MODE 활성화 시 log 생성)
+│   └── logs/                              # 실행 로그
+│        └── 2026-08-31-17-21-56_1_Sample_Album.log   # 상세 로그 샘플
 │
 └── subtitle/
     ├── index.srt.js                     # MP3 → SRT 자막 추출 실행 파일
@@ -203,7 +221,7 @@ lyrics/album/
 | `processing` | 현재 작업 중 |
 | `lyrics_done` | 가사 생성 및 검토 완료, 번역 대기 |
 | `done` | 가사와 번역까지 완료 |
-| `error` | 작업 실패 또는 최대 반복 횟수 초과 |
+| `error` | 최대 반복 횟수 초과 등으로 작업이 완료되지 않은 트랙 |
 
 프로그램은 `todo`, `processing`, `error`, `lyrics_done` 상태의 트랙을 작업 대상으로 확인한다.
 
@@ -228,6 +246,33 @@ PASS
 REVISION
 ```
 
+### 참고사항
+
+Claude에는 `system prompt`와 `user prompt`를 구분하여 전달하며, `REVISION` 발생 시 현재 가사와 이전 피드백을 다음 요청에 함께 전달한다. 번역 단계에서는 최종 가사와 번역 규칙을 전달한다.
+
+**Generate**
+
+```text
+System → 앨범 규칙(예: 1_Sample.txt) + 생성 규칙(rules.json > lyric_generate_prompt)
+User   → 곡 제목(예: 1_Sample.json > title) + 곡 설명(예: 1_Sample.json > concept)
+```
+
+**Review**
+
+```text
+System → 앨범 규칙(예: 1_Sample.txt) + 검토 규칙(rules.json > lyric_review_checklist)
+User   → 곡 정보(예: 1_Sample.json > title, concept)
+         + 현재 가사(예: 1_Sample.json > lyrics)
+         + 이전 피드백 (REVISION 이후 Claude 응답)
+```
+
+**Translate**
+
+```text
+System → 앨범 규칙(예: 1_Sample.txt) + 번역 규칙(rules.json > lyric_translate_rule)
+User   → 최종 가사(예: 1_Sample.json > lyrics)
+```
+
 ### 결과 파일
 
 `PASS`된 가사는 한국어 번역을 추가한 뒤 `lyrics/output/` 아래에 저장한다.
@@ -245,8 +290,14 @@ lyrics/output/1_Test/1.Rain_on_the_Window.txt
 비 오는 창가 앞, 아무 생각 없이 앉아 있는 상태.
 
 [Verse 1]
-Gray light leaks through the fog outside
-안개 너머로 잿빛 빛이 스며들고
+Gray light coming through the bus stop glass
+
+...
+====================
+
+[Verse 1]
+Gray light coming through the bus stop glass
+회색빛이 버스 정류장 유리로 스며들고
 ```
 
 ### 로그
@@ -287,6 +338,7 @@ npm run srt:y
 ### 참고사항
 
 > 생성된 SRT는 가사와 다를 수 있으므로 사용 전에 검토가 필요하다.
+
 ---
 
 ## 8. 라이선스

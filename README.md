@@ -1,4 +1,14 @@
+
 # ai-lyrics-automation
+
+**한국어** | [English](./README.en.md)
+
+```text
+┌──────────────────────────────────────────┐
+│          AI · CLAUDE · WHISPER           │
+│      Music Production Automation         │
+└──────────────────────────────────────────┘
+```
 
 AI를 이용한 음악 제작 보조 자동화 프로젝트.
 
@@ -58,6 +68,7 @@ ai-lyrics-automation/
 ├── .gitignore
 ├── LICENSE
 ├── LICENSE-MUSIC
+├── README.en.md
 ├── README.md
 ├── package.json
 │
@@ -66,7 +77,7 @@ ai-lyrics-automation/
 │   └── demo-subtitle.mp4
 │
 ├── lyrics/
-│   ├── index.claude.js                    # 가사 자동화 실행 파일
+│   ├── index.claude.js                    # 가사 생성·검토·번역 실행 파일
 │   ├── album/                             # 앨범별 기획 데이터와 규칙
 │   │   ├── 1_Sample.json                  # 트랙 정보와 작업 상태
 │   │   └── 1_Sample.txt                   # 앨범별 장르·콘셉트·가사 규칙

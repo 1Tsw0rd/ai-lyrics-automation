@@ -5,17 +5,28 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: "../.env" });
 
-const anthropic = new Anthropic({ apiKey: process.env.CLAUDE_API_KEY });
+// ── 환경 변수 및 상수 ─────────────────────────────────────────────────
+function requireEnv(name) {
+  const value = process.env[name];
+  if (value === undefined || value === "") {
+    console.error(`❌ 환경변수 누락: ${name} — .env 파일을 확인하세요 (.env.example 참고).`);
+    process.exit(1);
+  }
+  return value;
+}
 
-const START_ALBUM = parseInt(process.env.START_ALBUM || "1");
-const END_ALBUM = parseInt(process.env.END_ALBUM || "0");
-const MAX_ROUNDS = parseInt(process.env.MAX_ROUNDS || "10");
-const CLAUDE_GENERATE_MODEL = process.env.CLAUDE_GENERATE_MODEL || "claude-sonnet-4-6";
-const CLAUDE_REVIEW_MODEL = process.env.CLAUDE_REVIEW_MODEL || "claude-sonnet-4-6";
-const CLAUDE_TRANSLATE_MODEL = process.env.CLAUDE_TRANSLATE_MODEL || "claude-sonnet-4-6";
-const DEBUG_MODE = process.env.DEBUG_MODE === "true";
-const SLEEP_LYRICS_MS = parseInt(process.env.SLEEP_LYRICS_MS || "3000");
-const SLEEP_TRANSLATE_MS = parseInt(process.env.SLEEP_TRANSLATE_MS || "3000");
+const CLAUDE_API_KEY = requireEnv("CLAUDE_API_KEY");
+const anthropic = new Anthropic({ apiKey: CLAUDE_API_KEY });
+const ENABLE_THINKING = requireEnv("ENABLE_THINKING") === "true";
+const CLAUDE_GENERATE_MODEL = requireEnv("CLAUDE_GENERATE_MODEL");
+const CLAUDE_REVIEW_MODEL = requireEnv("CLAUDE_REVIEW_MODEL");
+const CLAUDE_TRANSLATE_MODEL = requireEnv("CLAUDE_TRANSLATE_MODEL");
+const DEBUG_MODE = requireEnv("DEBUG_MODE") === "true";
+const START_ALBUM = parseInt(requireEnv("START_ALBUM"));
+const END_ALBUM = parseInt(requireEnv("END_ALBUM"));
+const MAX_ROUNDS = parseInt(requireEnv("MAX_ROUNDS"));
+const SLEEP_LYRICS_MS = parseInt(requireEnv("SLEEP_LYRICS_MS"));
+const SLEEP_TRANSLATE_MS = parseInt(requireEnv("SLEEP_TRANSLATE_MS"));
 
 const rules = JSON.parse(fs.readFileSync("./rules/rules.json", "utf-8"));
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -51,12 +62,6 @@ function log(msg) {
   console.log(line);
   if (logFilePath) fs.appendFileSync(logFilePath, line + "\n", "utf-8");
 }
-
-// function logDebug(label, content) {
-//   const block = `\n${"=".repeat(60)}\n[DEBUG] ${label}\n${"─".repeat(60)}\n${content}\n${"─".repeat(60)}`;
-//   if (logFilePath) fs.appendFileSync(logFilePath, block + "\n", "utf-8");
-//   if (DEBUG_MODE) console.log(block);
-// }
 
 function logDebug(label, content) {
   if (!DEBUG_MODE) return;
@@ -104,10 +109,13 @@ async function generateLyrics(track, albumRules, prevFeedback = "", currentLyric
     const msg = await anthropic.messages.create({
       model: CLAUDE_GENERATE_MODEL,
       max_tokens: 2000,
+      thinking: ENABLE_THINKING ? { type: "adaptive" } : { type: "disabled" },
       system: systemPrompt,
       messages: [{ role: "user", content: userPrompt }],
     });
-    const text = msg.content[0].text.trim();
+    console.log(JSON.stringify(msg, null, 2));
+    const textBlock = msg.content.find((block) => block.type === "text");
+    const text = (textBlock?.text || "").trim();
     logDebug("Claude 가사생성 응답", text);
     return text;
   } catch (err) {
@@ -117,6 +125,9 @@ async function generateLyrics(track, albumRules, prevFeedback = "", currentLyric
       saveSummary();
       process.exit(1);
     }
+    log(`  ❌ Claude 가사생성 오류 발생. 전체 작업 종료.`);
+    log(`  📋 원시 오류: ${err.message || JSON.stringify(err)}`);
+    saveSummary();
     throw err;
   }
 }
@@ -147,10 +158,12 @@ async function reviewLyrics(track, albumRules, lyrics, prevFeedback = "") {
     const msg = await anthropic.messages.create({
       model: CLAUDE_REVIEW_MODEL,
       max_tokens: 2000,
+      thinking: ENABLE_THINKING ? { type: "adaptive" } : { type: "disabled" },
       system: systemPrompt,
       messages: [{ role: "user", content: userPrompt }],
     });
-    const text = msg.content[0].text.trim();
+    const textBlock = msg.content.find((block) => block.type === "text");
+    const text = (textBlock?.text || "").trim();
     logDebug("Claude 피드백 응답", text);
     return text;
   } catch (err) {
@@ -160,6 +173,9 @@ async function reviewLyrics(track, albumRules, lyrics, prevFeedback = "") {
       saveSummary();
       process.exit(1);
     }
+    log(`  ❌ Claude 피드백 오류 발생. 전체 작업 종료.`);
+    log(`  📋 원시 오류: ${err.message || JSON.stringify(err)}`);
+    saveSummary();
     throw err;
   }
 }
@@ -177,10 +193,12 @@ async function translateLyrics(lyrics, albumRules) {
     const msg = await anthropic.messages.create({
       model: CLAUDE_TRANSLATE_MODEL,
       max_tokens: 3000,
+      thinking: ENABLE_THINKING ? { type: "adaptive" } : { type: "disabled" },
       system: systemPrompt,
       messages: [{ role: "user", content: lyrics }],
     });
-    const text = msg.content[0].text.trim();
+    const textBlock = msg.content.find((block) => block.type === "text");
+    const text = (textBlock?.text || "").trim();
     logDebug("번역 결과", text);
     return text;
   } catch (err) {
@@ -190,6 +208,9 @@ async function translateLyrics(lyrics, albumRules) {
       saveSummary();
       process.exit(1);
     }
+    log(`  ❌ Claude 번역 오류 발생. 전체 작업 종료.`);
+    log(`  📋 원시 오류: ${err.message || JSON.stringify(err)}`);
+    saveSummary();
     throw err;
   }
 }

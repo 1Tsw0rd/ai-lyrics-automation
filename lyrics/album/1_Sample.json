@@ -1,0 +1,17 @@
+{
+  "album": "Sample Album",
+  "tracks": [
+    {
+      "id": 1,
+      "title": "Rain on the Window",
+      "concept": "비 오는 창가 앞, 아무 생각 없이 앉아 있는 상태. 하루를 시작하기 전, 멈춰 있는 여유.",
+      "status": "todo"
+    },
+    {
+      "id": 2,
+      "title": "No Rush Today",
+      "concept": "해야 할 건 있지만, 오늘만큼은 천천히 가도 괜찮다고 스스로를 허락하는 순간.",
+      "status": "todo"
+    }
+  ]
+}

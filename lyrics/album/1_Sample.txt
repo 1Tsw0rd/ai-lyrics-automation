@@ -1,0 +1,25 @@
+앨범 샘플용 규칙
+
+전체 톤: 감정 과잉 없이 담백하게, 말하듯이 표현
+장르: Lo-fi Chill Pop
+BPM: 70-90
+
+가사 규칙:
+- verse, chorus는 4줄 유지
+- 쉬운 영어 사용 (일상 회화 수준)
+- 코러스 마지막 줄은 트랙 고유 문구
+- Pre-Chorus 2번 등장 시 마지막 줄 변형 필수
+- Suno 태그 반드시 대괄호 사용 [Verse 1], [Chorus], [Bridge], [Outro]
+- 감정 과잉 금지, 어색한 영어 표현 금지
+
+구조 타입:
+- Type 1: V1 → Pre → Cho → V2 → Pre → Cho → Bri → Cho
+- Type 2: V1 → Cho → V2 → Cho → Bri → Cho
+- Type 3: V1 → Cho → V2 → Cho → Outro
+
+트랙별 소재:
+T1 Rain on the Window: 전용(창문, 버스, 안개), 가능(비, 회색 하늘), 금지(커피, 책)
+T2 No Rush Today: 전용(커튼, 할일목록), 가능(비, 아침), 금지(커피, 창문메인, 책)
+
+키워드 구간:
+T1~T2: rain / window / gray / quiet / morning

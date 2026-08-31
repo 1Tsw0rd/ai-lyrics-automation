@@ -279,6 +279,8 @@ User   → 곡 정보(예: 1_Sample.json > title, concept)
          + 이전 피드백 (REVISION 이후 Claude 응답)
 ```
 
+> REVISION 이후 재요청 시, Generate에도 직전 가사와 피드백이 함께 전달된다.
+
 **Translate**
 
 ```text

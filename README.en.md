@@ -280,6 +280,8 @@ User   → Track information (e.g. 1_Sample.json > title, concept)
          + previous feedback (Claude response after REVISION)
 ```
 
+> When re-requesting after REVISION, Generate is also given the previous lyrics and feedback.
+
 **Translate**
 
 ```text

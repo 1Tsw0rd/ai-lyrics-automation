@@ -76,7 +76,8 @@ ai-lyrics-automation/
 │   │   └── 1_Sample/                      # 결과물 저장할 앨범 디렉터리
 │   │         └── 1.Rain_on_the_Window.txt # 결과물 가사
 │   └── logs/                              # 실행 로그
-│        └── 2026-08-31-17-21-56_1_Sample_Album.log   # 상세 로그 샘플
+│        ├── 2026-08-31-17-21-56_1_Sample_Album.log   # 상세 로그 샘플(DEBUG_MODE=true)
+│        └── 2026-08-31-18-02-26_1_Sample_Album.log   # 일반 로그 샘플(DEBUG_MODE=false)
 │
 └── subtitle/
     ├── index.srt.js                     # MP3 → SRT 자막 추출 실행 파일

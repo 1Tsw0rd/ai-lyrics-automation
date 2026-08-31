@@ -4,10 +4,11 @@
   "type": "module",
   "scripts": {
     "lyrics": "cd lyrics && node index.claude.js",
-    "srt": "cd subtitle && node index.srt.js"
+    "srt": "cd subtitle && node index.srt.js",
+    "srt:y": "cd subtitle && node index.srt.js -y"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.24.0",
+    "@anthropic-ai/sdk": "^0.122.0",
     "dotenv": "^16.6.1"
   }
 }
